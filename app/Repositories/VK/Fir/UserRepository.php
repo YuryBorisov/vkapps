@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\Fir;
+namespace App\Repositories\VK\Fir;
 
 use App\Models\VK\Fir\FirUsers;
 use App\Repositories\BaseRepository;
 
 class UserRepository extends BaseRepository {
 
-    protected $group = 'users_fir';
+    protected $group = 'vk_users_fir';
 
     private function getCacheById(){
         return $this->getCacheTags($this->group, 'id');

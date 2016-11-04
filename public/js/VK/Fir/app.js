@@ -621,9 +621,7 @@ $(document).ready(function(){
         }
         DrawAllFigure();
         hint = $('.word').html();
-
-        /*
-         for (var i = 2; i <= array_map_world.length - 2; i++) {
+        for (var i = 2; i <= array_map_world.length - 2; i++) {
          for (var j = 0; j < array_map_world[i].length; j++) {
          if (array_map_world[i][j] != 0) {
          var k = getRandomInt(0, 3);
@@ -632,9 +630,7 @@ $(document).ready(function(){
          }
          }
          }
-         }
-         */
-
+        }
         SkipDefault();
         getH(13, 7);
         DrawAllFigure();

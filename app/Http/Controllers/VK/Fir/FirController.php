@@ -4,7 +4,7 @@ namespace App\Http\Controllers\VK\Fir;
 
 use App\Models\VK\Fir\Firs;
 use App\Models\VK\Fir\FirUsers;
-use App\Repositories\Fir\UserRepository;
+use App\Repositories\VK\Fir\UserRepository;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
