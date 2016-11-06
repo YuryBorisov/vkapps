@@ -5,7 +5,7 @@
     <script type="text/javascript" src="/js/jquery-2.0.0.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <script src="//vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
-    <script src="/js/VK/Animals/app.js"></script>
+    <script src="/js/VK/Animals/app.min.js"></script>
     <meta charset="utf-8"/>
 </head>
 <body>
