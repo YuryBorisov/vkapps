@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', function () { return view('welcome'); });
+Route::get('/', ['as' => 'home', 'uses' => 'Controller@home']);
 
 Route::group(['prefix' => 'vk'], function(){
     Route::group(['prefix' => 'fir'], function(){

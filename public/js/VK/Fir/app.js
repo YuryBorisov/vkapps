@@ -31,7 +31,6 @@ $(document).ready(function(){
         $('#last_name').text(data.response[0].last_name);
         vk_id = data.response[0].uid;
         ajaxRequest('/vk/fir/user', 'post', {vk_id: vk_id}, function (data) {
-            console.log(data);
             if(data.status == 'success'){
                 if(data.data.user == 'new'){
                     $('.word').html("<div id='info' style='width:480px; height:340px;'></div><div id='bat'></div>");
