@@ -15,20 +15,16 @@ $(document).ready(function(){
 
     const N = x * y;
 
-    var vk_id = 333114129;
+    var vk_id;
 
     var arrayTypeAnimals = [];
 
-    VK.api("friends.getAppUsers", {}, function(data) {
-        arrFriends = data.response.join();
-    });
-
-    function ajaxRequest(url, type, data, func){
+    function ajaxRequest(url, type, data, func) {
         $.ajax({
             url: url,
             type: type,
             data: data,
-            success: function (data) {
+            success: function(data){
                 func(data);
             }
         });
@@ -39,34 +35,20 @@ $(document).ready(function(){
         $('.avatar_user').css('background-image', "url(" + data.response[0].photo_50 + ")");
         $('.name').text(data.response[0].first_name);
         $('.last_name').text(data.response[0].last_name);
-        $.ajax({
-            url: '/vk/animals/is',
-            type: 'post',
-            data: {vk_id: vk_id},
-            success: function(data){
-                data = $.parseJSON(data);
-                $('.lvl').text(levelUser = data.level);
-                $('.count_animals').text(countAnimalsUser = data.count_animals);
-            }
-        });
     });
 
-    $.ajax({
-        url:'/vk/animals/animals',
-        type:'post',
-        success: function(data){
-            data = $.parseJSON(data);
-            for(var i = 0, j = data.length; i < j; i++){
-                arrayTypeAnimals.push({
-                    type: data[i].type,
-                    name: data[i].name,
-                    path_map: data[i].path_map,
-                    path_avatar: data[i].path_avatar,
-                    step: data[i].step,
-                    avatar_zv : data[i].avatar_zv
-                });
-            }
+    VK.api("friends.getAppUsers", {}, function(data) {
+        arrFriends = data.response;
+    });
+
+    ajaxRequest('/vk/animals/animals', 'post', {}, function (data) {
+        if(data.response.status == 'success'){
+            data['response']['data'].forEach(function(i){
+                arrayTypeAnimals.push(i);
+            });
             countTypeAnimals = arrayTypeAnimals.length;
+        }else{
+            alert(data.response.message);
         }
     });
 
@@ -134,31 +116,24 @@ $(document).ready(function(){
         for(var i = 0; i <= x; i++){
             for(var j = 0; j <= y; j++){
                 if(getLocationStatus(i, j) && !getLocationAnimals(i , j)){
-                    //$('#' + mainMapLoc + '_x_' + i + '_y_' + j).text(i + '/' + j);
                     var x_top = (j % 2 == 0) ? i - 1 : i;
                     var y_top = j + 1;
                     var x_left = (j % 2 == 0) ? i - 1 : i;
                     var y_left = j - 1;
                     var elem = $('#' + mainMapLoc + '_x_' + i + '_y_' + j);
                     if(x_top >= 0 && y_top <= y && x_left >= 0 && y_left >= 0 && !getLocationAnimal(i, j) && getLocationStatus(x_top, y_top) && getLocationStatus(x_left, y_left)){
-                        //$('#' + mainMapLoc + '_x_' + i + '_y_' + j).removeClass().addClass('loc water');
                         elem.removeClass();
                         elem.addClass('loc water');
                     }else if(x_top >= 0 && y_top <= y && !getLocationAnimal(i, j) && getLocationStatus(x_top, y_top)){
-                        //$('#' + mainMapLoc + '_x_' + i + '_y_' + j).removeClass().addClass('loc water_1');
                         elem.removeClass();
                         elem.addClass('loc water_1');
                     }else if(x_left >= 0 && y_left >= 0 && !getLocationAnimal(i, j) && getLocationStatus(x_left, y_left)){
-                        // $('#' + mainMapLoc + '_x_' + i + '_y_' + j).removeClass().addClass('loc water_2');
                         elem.removeClass();
                         elem.addClass('loc water_2');
-                    }//else if(x_left >= 0 && y_left <= y - 1 && getLocationStatus(x_left, y_left)){
-                    //  $('#' + mainMapLoc + '_x_' + i + '_y_' + j).removeClass().addClass('loc water');
-                    //}
+                    }
                     else{
                         if(getLocationAnimal(i, j))
                             continue;
-                        //$('#' + mainMapLoc + '_x_' + i + '_y_' + j).removeClass().addClass('loc stop');
                         elem.removeClass();
                         elem.addClass('loc stop');
                     }
@@ -305,7 +280,6 @@ $(document).ready(function(){
                 addClass('loc exit_exit');
                 return { status: true, location: v.location };
             }else{
-                console.log('create Удалили выход из массива ' + arrayONLocation[i].x + ' : ' + arrayONLocation[i].y);
                 deleteONLocation(arrayONLocation[i].x, arrayONLocation[i].y, animal);
                 createLocationLocAnimals(animal);
             }
@@ -397,8 +371,6 @@ $(document).ready(function(){
         var li2 = li(animal);
         var arrLI = li2.array;
         if(li2.status != 'ok'){
-            console.log('Игра ОКОНЧЕНА ок');
-            //arrayAnimals[animal].x, arrayAnimals[animal].y
             arrayLocation[arrayAnimals[animal].x][arrayAnimals[animal].y].status = false;
             arrayLocation[arrayAnimals[animal].x][arrayAnimals[animal].y].animal = false;
             redrawingLocation();
@@ -411,7 +383,6 @@ $(document).ready(function(){
             var arrLiLength = arrLI.length;
             var indexArrLiLocExit = arrLI[arrLiLength - 2].length - 1;
             var valueArrLiLocExit = arrLI[arrLiLength - 2][indexArrLiLocExit];
-            $('#' + mainMapLoc + '_x_' + valueArrLiLocExit.x + '_y_' + valueArrLiLocExit.y).text('yes');
             var c = getCoordinates(arrayAnimals[animal].x, arrayAnimals[animal].y);
             for(var i = 0; i < onLocationLength; i++){
                 if(arrayONLocation[i].x == c['x_top'] && arrayONLocation[i].y == c['y_top']
@@ -437,22 +408,18 @@ $(document).ready(function(){
                 arrCoordinates = getCoordinates(valueArrLiLocExit.x, valueArrLiLocExit.y);
                 for(var j = arrLI[i].length - 1; j >= 0; j--){
                     if(arrLI[i][j].number == valueArrLiLocExit.number - 1 && arrLI[i][j].x == arrCoordinates['x_top'] && arrLI[i][j].y == arrCoordinates['y_top']){
-                        //$('#' + mainMapLoc + '_x_' + arrCoordinates['x_top'] + '_y_' + arrCoordinates['y_top']).text(arrLI[i][j].x + '/' + arrLI[i][j].y);
                         stepLoc.push(valueArrLiLocExit = arrLI[i][j]);
                         break;
                     }
                     else if(arrLI[i][j].number == valueArrLiLocExit.number - 1 && arrLI[i][j].x == arrCoordinates['x_bottom'] && arrLI[i][j].y == arrCoordinates['y_bottom']){
-                        // $('#' + mainMapLoc + '_x_' + arrCoordinates['x_bottom'] + '_y_' + arrCoordinates['y_bottom']).text(arrLI[i][j].x + '/' + arrLI[i][j].y);
                         stepLoc.push(valueArrLiLocExit = arrLI[i][j]);
                         break;
                     }
                     else if(arrLI[i][j].number == valueArrLiLocExit.number - 1 && arrLI[i][j].x == arrCoordinates['x_left'] && arrLI[i][j].y == arrCoordinates['y_left']){
-                        //$('#' + mainMapLoc + '_x_' + arrCoordinates['x_left'] + '_y_' + arrCoordinates['y_left']).text(arrLI[i][j].x + '/' + arrLI[i][j].y);
                         stepLoc.push(valueArrLiLocExit = arrLI[i][j]);
                         break;
                     }
                     else if(arrLI[i][j].number == valueArrLiLocExit.number - 1 && arrLI[i][j].x == arrCoordinates['x_right'] && arrLI[i][j].y == arrCoordinates['y_right']){
-                        //$('#' + mainMapLoc + '_x_' + arrCoordinates['x_right'] + '_y_' + arrCoordinates['y_right']).text(arrLI[i][j].x + '/' + arrLI[i][j].y);
                         stepLoc.push(valueArrLiLocExit = arrLI[i][j]);
                         break;
                     }
@@ -468,24 +435,24 @@ $(document).ready(function(){
             return {
                 status: 'ok'
             };
-        } else console.log('Игра окончена');
+        } else {
+            console.log('Игра окончена');
+        }
     }
 
     function finishGame(isArcade,  count) {
-        $.ajax({
-            url: '/vk/animals/inc',
-            type: 'post',
-            data: {arcade: isArcade, vk_id: vk_id, count_animals: count},
-            success: function (data) {
-                data = $.parseJSON(data);
-                $('.lvl').text(levelUser = data.level);
-                $('.count_animals').text(countAnimalsUser = data.count_animals);
+        ajaxRequest('/vk/animals/inc', 'post', {arcade: isArcade, vk_id: vk_id, count_animals: count}, function (data) {
+            if(data.response.status == 'success'){
+                $('.lvl').text(levelUser = data.response.data.level);
+                $('.count_animals').text(countAnimalsUser = data.response.data.count_animals);
                 VK.api('wall.post', {
                     message: 'Не дай диким зверям сбежать из зоопарка на волю! https://vk.com/app5420739',
                     attachment: 'photo-116990872_411853868'
-                })
+                });
+            }else{
+                alert(data.response.message);
             }
-        });
+        }); 
     }
 
     $(document).on('click', '.' + mainMapLoc, function(){
@@ -498,44 +465,32 @@ $(document).ready(function(){
                 switch ($(mainMap).attr('status')){
                     case 'arcade':
                         switch (liClose(animal).status){
-                            case 'ok':
-                                console.log('Продолжаем играть');
-                                break;
                             case 'win':
-                                console.log('Вы поймали Зверя');
                                 arrayAnimals.splice(animal, 1);
                                 if(arrayAnimals.length == 0) {
-                                    console.log('ВЫ ПРОШЛИ УРОВЕНЬ');
                                     R(1);
                                     finishGame(1, countAnimals);
                                 }
-                                else {
-                                    console.log(arrayAnimals);
-                                }
                                 break;
                             case 'caught':
-                                console.log('Зверь выбежал');
                                 R(0);
-                                console.log('ВЫ ПРОИГРАЛИ');
                                 break;
                         }
                         break;
                     case 'rating':
                         switch (liClose(animal).status){
                             case 'win':
-                                console.log('Вы поймали Зверя');
                                 arrayAnimals.splice(animal, 1);
                                 ratingCount++;
                                 break;
                             case 'caught':
-                                console.log('Зверь выбежал');
                                 arrayAnimals.splice(animal, 1);
                                 break;
                         }
                         if(arrayAnimals.length == 0){
                             $('.map').append('<div class="panel_user_game">' +
                                 '<div class="img_r"></div>' +
-                                '<div class="restart_game_rating">Сыграть ещё</div>' +
+                                '<div class="restart_game_rating">Переиграть</div>' +
                                 '</div>');
                             $('.panel_user_game').css('margin-top', '142px');
                             locFunc(0.5, 0, false);
@@ -582,9 +537,7 @@ $(document).ready(function(){
         arr['x_right'] = (y_loc % 2 == 0) ? x_loc : x_loc + 1;
         arr['y_right'] = arr['y_top'];
         return arr;
-    }
-
-    /* КНОПКИ */
+    } 
 
     $(document).on('click', '#game_rating', ratingHTML);
 
@@ -599,26 +552,21 @@ $(document).ready(function(){
     }
 
     function initMap() {
-        $('.container').html(
-            '<div class="map"></div>' +
-            '<div class="right_menu">' +
-            '<div class="back_arcade_game"> ' +
-            '<button class="sprite_back_arcade">Главное Меню</button> </div> ' +
+        $('.container').html('<div class="map"></div><div class="right_menu">' +
+            '<div class="back_arcade_game"><button class="sprite_back_arcade">Главное Меню</button> </div> ' +
             '</div>');
     }
 
     function gameLevel(){
         initMap();
-        $.ajax({
-            url: '/vk/animals/level',
-            type: 'post',
-            data: {vk_id: vk_id},
-            success: function(data){
-                data = $.parseJSON(data);
-                countAnimals = data.count_animals;
+        ajaxRequest('/vk/animals/arcade/user', 'post', {vk_id: vk_id}, function (data) {
+            if(data.response.status == 'success'){
+                countAnimals = data.response.data.level.count_animals;
                 createA('arcade');
-                setLocationAnimals(data.spaces_count);
+                setLocationAnimals(data.response.data.level.spaces_count);
                 rightPanelInit();
+            }else{
+                alert(data.response.message);
             }
         });
     }
@@ -629,23 +577,22 @@ $(document).ready(function(){
 
     $(document).on('click', '#game_arcade', function(){
         var lvl = '', lvl_cont = 27;
-        $.ajax({
-            url: '/vk/animals/get',
-            type: 'post',
-            data: {vk_id: vk_id, types: ['level', 'countAnimals']},
-            success: function(data){
-                data = $.parseJSON(data);
-                console.log(data);
-                $('.lvl').text(levelUser = data.level);
+        ajaxRequest('/vk/animals/get', 'post', {vk_id: vk_id}, function (data) {
+            if(data.response.status == 'success'){
+                $('.lvl').text(levelUser = data.response.data.level);
                 lvl += "<div class='sprite_cl_ar' id='close_arcad'></div>";
-                $('.count_animals').text(countAnimalsUser = data.countAnimals);
-                for(var i = 1; i < levelUser; i++)
+                $('.count_animals').text(countAnimalsUser = data.response.data.count_animals);
+                for(var i = 1; i < levelUser; i++){
                     lvl += "<div class='lvl_end lvl_ac sprite_lvl'><div class='information_lvl'>" + (i) + "</div></div>";
+                }
                 lvl += levelUser <= lvl_cont ? "<div class='lvl_on lvl_ac sprite_lvl' lvl=><div class='information_lvl'>" + (i) + "</div></div>": '';
-                for(var i = levelUser + 1; i <= lvl_cont; i++)
+                for(var i = levelUser + 1; i <= lvl_cont; i++){
                     lvl += "<div class='lvl_off sprite_lvl lvl_ac'><div class='information_lvl'>" + (i) + "</div></div>";
+                }
                 var html = ' <div class="arcade"><div class="content"><div class="block_levels">' + lvl+ '</div></div></div>';
                 $('.container').html(html);
+            }else{
+                alert(data.response.message);
             }
         });
     });
@@ -688,7 +635,7 @@ $(document).ready(function(){
 
     function vkUsersInformation(vk_ids) {
         VK.api("users.get", {
-            uids: vk_ids,
+            user_ids: vk_ids,
             fields: "id,photo_50,first_name,last_name"
         }, function(data) {
             for(var i = 0, j = data.response.length; i < j; i++){
@@ -697,79 +644,60 @@ $(document).ready(function(){
                 $('.last_name_' + data.response[i].uid).text(data.response[i].last_name);
             }
         });
-    };
+    }
 
-    function rating(type_rating, page) {
-        var t = '';
-        var vk_ids = '';
-        var data = {
-            type_rating: type_rating,
-            page: page
-        };
-        if(type_rating == 'friends') data.vk_ids_friends = arrFriends;
-        $.ajax({
-            url: '/vk/animals/rating',
-            type: 'post',
-            data: data,
-            success: function (data) {
-                console.log(data);
-                data = $.parseJSON(data);
-                for(var i = 0, j = data.data.length; i < j; i++){
-                    vk_ids += data.data[i].vk_id + ',';
-                    t += '<div class="user_panel user_panel_sprite">' +
-                        '<div class="number_user">' +
-                        '<button>' + (((page == 1) ? 0 : (page - 1) * 14) + i + 1) + '</button>' +
-                        '</div>'+
-                        '<img class="avatar_user avatar_user_' + data.data[i].vk_id + '" src="/images/VK/Animals/load.gif"/>' +
-                        '<div class="info">' +
-                        '<div class="first_name first_name_'+ data.data[i].vk_id + '">Загрузка</div>' +
-                        '<div class="last_name last_name_'+ data.data[i].vk_id + '">Загрузка</div>' +
-                        '</div>'+
-                        '<div class="level">' + data.data[i].count_animals +'</div>' +
-                        '</div>';
-                }
-                var bottom = '';
-                var next = '<div class="sprite_next" id="next" page="' + data.next_page + '" type_rating="' + type_rating + '"></div>';
-                var pred = '<div class="sprite_pred" id="pred" page="' + data.pred_page + '" type_rating="' + type_rating + '"></div>';
-                var invite = '<div class="intive_spring" id="invite"></div>';
-                console.log(data);
-                if(data.next_page == 'not' && data.pred_page == 'not')
+    function rating(type, page) {
+        var data = {type: type, page: page};
+        if(type == 'friends'){
+            data.vk_ids = arrFriends;
+        }
+        ajaxRequest('/vk/animals/rating', 'post', data, function (data) {
+            if(data.response.status == 'success'){
+                var t = '';
+                if(data.response.data.users.length == 0){
                     t += '<div style="margin-left: 182px; margin-top:180px;cursor:default; ' +
-                        'font-size: 54px;font-family: FIRENIGHT-REGULAR;">Рейтинг Пуст</div>'
-                else if(data.pred_page == 1 && data.next_page == 'not')
-                    bottom += invite;
-                else if(data.pred_page == 1){
-                    bottom += invite;
-                    bottom += next;
-                }else if(data.next_page == 'not'){
-                    bottom += pred;
-                    bottom += invite;
+                        'font-size: 54px;font-family: FIRENIGHT-REGULAR;">Рейтинг Пуст</div>';
                 }else{
-                    bottom += pred;
-                    bottom += next;
+                    var vk_ids = '';
+                    var n = ((data.response.data.page = parseInt(data.response.data.page)) - 1) * 14;
+                    data.response.data.users.forEach(function (i) {
+                        vk_ids += i.vk_id+ ',';
+                        t += '<a href="https://vk.com/id' + i.vk_id + '" target="_blank">' +
+                            '<div class="user_panel user_panel_sprite">' +
+                            '<div class="number_user">' +
+                            '<button>' + (++n) + '</button>' +
+                            '</div>'+
+                            '<img class="avatar_user avatar_user_' + i.vk_id + '" src="/images/VK/Animals/load.gif"/>' +
+                            '<div class="info">' +
+                            '<div class="first_name first_name_'+ i.vk_id + '">Загрузка</div>' +
+                            '<div class="last_name last_name_'+ i.vk_id + '">Загрузка</div>' +
+                            '</div>'+
+                            '<div class="level">' + i.count_animals +'</div>' +
+                            '</div>' +
+                            '</a>';
+                    });
+                    var next = '<div class="sprite_next" id="next" page="' + (data.response.data.page + 1) + '" type="' + type + '"></div>';
+                    var prev = '<div class="sprite_pred" id="pred" page="' + (data.response.data.page - 1) + '" type="' + type + '"></div>';
+                    var invite = '<div class="intive_spring" id="invite"></div>';
+                    $('.bottom_block').html(data.response.data.next ? data.response.data.page == 1 ? invite + next : prev + next : data.response.data.page == 1 ? invite : prev + invite);
+                    vkUsersInformation(vk_ids = vk_ids.substring(0, vk_ids.length - 1));
                 }
                 $('.users').html(t);
-                $('.bottom_block').html(bottom);
-                vkUsersInformation(vk_ids.substr(0, vk_ids.length - 1));
+            }else{
+                alert(data.response.message);
             }
         });
     }
 
     $(document).on('click', '#game_game_rating', function () {
-        var html = '<div id="rating_fon">' +
-            '<div class="panel">' +
-            '<div class="block">' +
+        var html = '<div id="rating_fon"><div class="panel"><div class="block">' +
             '<div class="back_rating back_rating_sprite"></div>'+
             '<div class="logo"></div>'+
             '<div class="menu_rating sprite_rating_menu rating_today" id="rating_today"></div>'+
             '<div class="menu_rating sprite_rating_menu rating_all" id="rating_all"></div>'+
             '<div class="menu_rating sprite_rating_menu rating_friends" id="rating_friends"></div>'+
-            '</div>' +
-            '</div>'+
-            '<div class="panel_rating_user">' +
-            '<div class="users"></div>' +
-            '<div class="bottom_block"></div>' +
-            '</div>';
+            '</div></div><div class="panel_rating_user"><div class="users"></div>' +
+            '<div class="bottom_block"></div></div>';
         $('.container').html(html);
         rating('all', 1);
         $('#rating_all').removeClass('rating_all').addClass('rating_all_off');
@@ -799,13 +727,11 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '#next', function () {
-        var page = $(this).attr('page');
-        var type = $(this).attr('type_rating');
-        rating(type, page);
+        rating($(this).attr('type'), $(this).attr('page'));
     });
 
     $(document).on('click', '#pred', function () {
-        rating($(this).attr('type_rating'), $(this).attr('page') - 1);
+        rating($(this).attr('type'), $(this).attr('page'));
     });
 
     $(document).on('click', '.back_rating', function () {

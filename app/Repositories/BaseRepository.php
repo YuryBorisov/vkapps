@@ -23,14 +23,4 @@ abstract class BaseRepository{
         return Cache::tags([$group, $key]);
     }
 
-    abstract public function isById($id);
-
-    abstract public function addById($id);
-
-    abstract public function getByIds(array $ids);
-
-    abstract public function addByIds(array $ids);
-
-    abstract public function getById($id);
-
 }

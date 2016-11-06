@@ -13,8 +13,8 @@ class FirUsers extends Model
         return $this->db()->insert($arr);
     }
 
-    public function getUser($id, array $field = ['*']){
-        return $this->db()->where('vk_id', $id)->first($field);
+    public function getUser($vkId, array $field = ['*']){
+        return $this->db()->where('vk_id', $vkId)->first($field);
     }
 
     public function incrementCountFirs($vkId){
@@ -25,8 +25,8 @@ class FirUsers extends Model
         return $this->db()->select($field)->skip($skip)->limit($limit)->orderBy('count_firs', $orderBy)->get();
     }
 
-    public function getUsersIds(array $ids, $skip = 0, $limit = 1, $orderBy = 'asc', array $field = ['*']){
-        return $this->db()->select($field)->whereIn('vk_id', $ids)->skip($skip)->limit($limit)->orderBy('count_firs', $orderBy)->get();
+    public function getUsersIds(array $vkIds, $skip = 0, $limit = 1, $orderBy = 'asc', array $field = ['*']){
+        return $this->db()->select($field)->whereIn('vk_id', $vkIds)->skip($skip)->limit($limit)->orderBy('count_firs', $orderBy)->get();
     }
 
     private function db(){

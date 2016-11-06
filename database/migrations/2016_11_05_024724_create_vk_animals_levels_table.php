@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAnimalsUsersTable extends Migration
+class CreateVKAnimalsLevelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateAnimalsUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('animals_users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
+        Schema::create('vk_animals_levels', function (Blueprint $table) {
+            $table->tinyInteger('level_id', true, true);
+            $table->tinyInteger('count_animals');
+            $table->tinyInteger('spaces_count');
         });
     }
 
@@ -26,6 +27,6 @@ class CreateAnimalsUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('animals_users');
+        Schema::dropIfExists('vk_animals_levels');
     }
 }

@@ -100,4 +100,39 @@ class FirController extends Controller
         return $response;
     }
 
+    public function generate(){
+        $vkIds = [
+            '36765', '12676639', '16622006', '17157431',
+            '22697595', '32070524', '36053375', '72969633',
+            '83849627', '121780335', '123730550', '142899669',
+            '250362666'
+        ];
+        $firsModel = new Firs();
+        $firsUserModel = new FirUsers();
+        DB::beginTransaction();
+        try{
+            foreach ($vkIds as $id){
+                $rand = rand(1, 22);
+                $arr = [];
+                for ($i = 0; $i < $rand; $i++){
+                    $arr[] = [
+                        'vk_id' => $id,
+                        'create' => date('Y:m:d H:i:s')
+                    ];
+                }
+                $firsUserModel->add([
+                    'vk_id' => $id,
+                    'count_firs' => $rand,
+                    'create' => date('Y:m:d H:i:s')
+                ]);
+                $firsModel->add($arr);
+            }
+            DB::commit();
+            echo 'End.';
+        }catch (QueryException $e){
+            DB::rollback();
+            echo $e->getMessage();
+        }
+    }
+
 }

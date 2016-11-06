@@ -3,9 +3,9 @@
 namespace App\Repositories\VK\Fir;
 
 use App\Models\VK\Fir\FirUsers;
-use App\Repositories\BaseRepository;
+use App\Repositories\BaseUserRepository;
 
-class UserRepository extends BaseRepository {
+class UserRepository extends BaseUserRepository {
 
     protected $group = 'vk_users_fir';
 

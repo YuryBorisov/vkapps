@@ -19,58 +19,19 @@ Route::group(['prefix' => 'vk'], function(){
         Route::post('user', ['as' => 'vk.fir.user', 'uses' => 'VK\Fir\FirController@isUser']);
         Route::post('rating', ['as' => 'vk.fir.rating', 'uses' => 'VK\Fir\FirController@getRating']);
         Route::post('add', ['as' => 'vk.fir.add', 'uses' => 'VK\Fir\FirController@addFir']);
-        Route::get('test', function(){
-            dd((new App\Models\VK\Fir\Firs())->getCountUsersFirByDate(date('Y-m-d'), 0, 1000));
-        });
-        Route::get('generate', function (){
-            $vkIds = [
-                '36765', '12676639', '16622006', '17157431',
-                '22697595', '32070524', '36053375', '72969633',
-                '83849627', '121780335', '123730550', '142899669',
-                '250362666'
-            ];
-            $firsModel = new App\Models\VK\Fir\Firs();
-            $firsUserModel = new \App\Models\VK\Fir\FirUsers();
-            \Illuminate\Support\Facades\DB::beginTransaction();
-            try{
-                foreach ($vkIds as $id){
-                    $rand = rand(1, 22);
-                    $arr = [];
-                    for ($i = 0; $i < $rand; $i++){
-                        $arr[] = [
-                            'vk_id' => $id,
-                            'create' => date('Y:m:d H:i:s')
-                        ];
-                    }
-                    $firsUserModel->add([
-                        'vk_id' => $id,
-                        'count_firs' => $rand,
-                        'create' => date('Y:m:d H:i:s')
-                    ]);
-                    $firsModel->add($arr);
-                }
-                \Illuminate\Support\Facades\DB::commit();
-                echo 'End.';
-            }catch (\Illuminate\Database\QueryException $e){
-                \Illuminate\Support\Facades\DB::rollback();
-                echo $e->getMessage();
-            }
+        Route::get('generate', ['as' => 'vk.fir.generate', 'uses' => 'VK\Fir\FirController@generate']);
+    });
+    Route::group(['prefix' => 'animals'], function(){
+        Route::get('app', ['as' => 'vk.animals.app', 'uses' => 'VK\Animals\AnimalsController@app']);
+        Route::post('inc', ['as' => 'vk.animals.inc', 'uses' => 'VK\Animals\AnimalsController@inc']);
+        Route::post('get', ['as'=> 'vk.animals.get', 'uses' => 'VK\Animals\AnimalsController@get']);
+        Route::post('animals', ['as' => 'vk.animals.animals', 'uses' => 'VK\Animals\AnimalsController@animals']);
+        Route::post('rating', ['as' => 'vk.animals.rating', 'uses' => 'VK\Animals\AnimalsController@rating']);
+        Route::get('generate', ['as' => 'vk.animals.generate', 'uses' => 'VK\Animals\AnimalsController@generate']);
+        Route::group(['prefix' => 'arcade'], function (){
+            Route::post('user', ['as' => 'vk.animals.arcade.user', 'uses' => 'VK\Animals\AnimalsController@arcadeGetLevelUser']);
+            Route::post('level', ['as' => 'vk.animals.arcade.level', 'uses' => 'VK\Animals\AnimalsController@arcadeGetLevel']);
+            Route::post('levels', ['as' => 'vk.animals.arcade.levels', 'uses' => 'VK\Animals\AnimalsController@arcadeGetLevels']);
         });
     });
 });
-
-/*
- * Route::get('/vk/app', ['as' => 'vk.vk.home', 'uses' => 'VK\VKController@home']);
-
-Route::post('/vk/app/user', ['as' => 'vk.vk.user', 'uses' => 'VK\Fir\FirController@isUser']);
-
-Route::post('/vk/app/rating/today/{page?}', ['as' => 'vk.vk.rating.today', 'uses' => 'VK\VKController@getRatingToDay']);
-
-Route::post('/vk/app/rating/all/{page?}', ['as' => 'vk.vk.rating.all', 'uses' => 'VK\VKController@getRatingAll']);
-
-Route::post('/vk/app/rating/friends/', ['as' => 'vk.vk.rating.friends', 'uses' => 'VK\VKController@getRatingFriends']);
-
-Route::post('/vk/app/addFirs', ['as' => 'vk.vk.add_firs', 'uses' => 'VK\VKController@addFirs']);
-
-Route::post('/vk/app/firs', ['as' => 'vk.vk.firs', 'uses' => 'VK\VKController@getFirs']);
- */
