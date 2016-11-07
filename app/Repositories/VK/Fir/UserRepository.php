@@ -5,29 +5,37 @@ namespace App\Repositories\VK\Fir;
 use App\Models\VK\Fir\FirUsers;
 use App\Repositories\BaseUserRepository;
 
-class UserRepository extends BaseUserRepository {
+class UserRepository extends BaseUserRepository
+{
 
     protected $group = 'vk_users_fir';
 
-    private function getCacheById(){
+    private function getCacheById()
+    {
         return $this->getCacheTags($this->group, 'id');
     }
 
-    public function isById($id){
+    public function isById($id)
+    {
         return $this->getCacheById()->has($id);
     }
 
-    public function getById($id){
+    public function getById($id)
+    {
         return $this->addById($id);
     }
 
-    public function getByIds(array $ids){
+    public function getByIds(array $ids)
+    {
         return $this->addByIds($ids);
     }
 
-    public function addById($id){
-        if(!$this->isById($id)){
-            if($user = (new FirUsers())->getUser($id)){
+    public function addById($id)
+    {
+        if (!$this->isById($id))
+        {
+            if ($user = (new FirUsers())->getUser($id))
+            {
                 $this->getCacheById()->forever($id, $user);
                 return $user;
             }
@@ -39,15 +47,20 @@ class UserRepository extends BaseUserRepository {
     public function addByIds(array $ids){
         $notIds = [];
         $users = [];
-        foreach ($ids as $id){
-            if ($this->isById($id)){
+        foreach ($ids as $id)
+        {
+            if ($this->isById($id))
+            {
                 $users[] = $this->getCacheById()->get($id);
-            }else{
+            } else
+            {
                 $notIds[] = $id;
             }
         }
-        if(($count = count($notIds)) > 0){
-            foreach ((new FirUsers())->getUsersIds($notIds, 0, $count) as $user){
+        if(($count = count($notIds)) > 0)
+        {
+            foreach ((new FirUsers())->getUsersIds($notIds, 0, $count) as $user)
+            {
                 $this->getCacheById()->forever($user->vk_id, $user);
                 $users[] = $user;
             }

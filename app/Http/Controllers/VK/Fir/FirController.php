@@ -16,25 +16,23 @@ class FirController extends Controller
 
     const RATING_COUNT_USERS = 7;
 
-    public function app(){
-        return view('VK/Fir/fir');
-    }
-
-    public function isUser(Request $request){
-        $response['status'] = 'error';
-        if($request->has('vk_id') && is_numeric($vkId = $request->input('vk_id'))){
-            $response['status'] = 'success';
+    public function app(Request $request)
+    {
+        if($request->has('viewer_id')){
+            $vkId = $request->input('viewer_id');
             if($user = UserRepository::instance()->getById($vkId)){
-                $response['data'] = ['user' => 'not_new', 'count_firs' => $user->count_firs];
+                $data = ['user' => 'not', 'count_firs' => $user->count_firs];
             }else{
                 (new FirUsers())->add(['vk_id' => $vkId, 'create' => date('Y-m-d H:i:s')]);
-                $response['data'] = ['user' => 'new', 'count_firs' => 0];
+                $data = ['user' => 'new', 'count_firs' => 0];
             }
+            return view('VK/Fir/fir', ['data' => $data]);
         }
-        return $response;
+        return 'Error';
     }
 
-    public function getRating(Request $request){
+    public function getRating(Request $request)
+    {
         $response['status'] = 'error';
         if($request->has('type') && $request->has('page')){
             $result['users'] = false;
@@ -74,7 +72,8 @@ class FirController extends Controller
         return $response;
     }
 
-    public function addFir(Request $request){
+    public function addFir(Request $request)
+    {
         $response['status'] = 'error';
         if($request->has('vk_id')){
             if($user = ($userRepository = UserRepository::instance())->getById($vkId = $request->input('vk_id'))){
@@ -100,7 +99,8 @@ class FirController extends Controller
         return $response;
     }
 
-    public function generate(){
+    public function generate()
+    {
         $vkIds = [
             '36765', '12676639', '16622006', '17157431',
             '22697595', '32070524', '36053375', '72969633',

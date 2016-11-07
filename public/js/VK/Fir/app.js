@@ -1,8 +1,8 @@
 $(document).ready(function(){
 
-    var vk_id;
-
     const DIR = '/images/VK/';
+
+    var array_map_world = getWordAndElka(), vk_id, color, history, ball_l = 30, array_loc = [], array_loc_figure = [], hint, elka_hint, hint_number = 3, arrFriends;
 
     $.ajaxSetup({
         headers: {
@@ -12,7 +12,6 @@ $(document).ready(function(){
 
     var date = new Date();
     var d = date.getHours();
-
     if ((d >= 17 || d <= 8)) {
         $('.fon').addClass('fon-night');
         $('#snegovik img').attr("src", DIR + "snegovik_noch.png");
@@ -30,21 +29,21 @@ $(document).ready(function(){
         $('#first_name').text(data.response[0].first_name);
         $('#last_name').text(data.response[0].last_name);
         vk_id = data.response[0].uid;
-        ajaxRequest('/vk/fir/user', 'post', {vk_id: vk_id}, function (data) {
-            if(data.status == 'success'){
-                if(data.data.user == 'new'){
-                    $('.word').html("<div id='info' style='width:480px; height:340px;'></div><div id='bat'></div>");
-                } else{
-                    $('.word').html("<div id='info' style='width:480px; height:340px;'></div><div id='bat'></div>");
-                    $('#info').css('background-image', "url('" + DIR + "comeback.png')");
-                }
-            }
-            $('#stolb div').text(data.data.count_firs);
-            if (data.data.count_firs == 0 || data.data.count_firs == 1 || data.data.count_firs == 2){
-                data.data.count_firs = 3;
-            }
-            $('#lvl button').text(parseFloat((data.data.count_firs / 3).toFixed(1)))
-        });
+        if ($('body').attr('user') == 'new'){
+            $('.word').html("<div id='info' style='width:480px; height:340px;'></div><div id='bat'></div>");
+        } else {
+            $('.word').html("<div id='info' style='width:480px; height:340px;'></div><div id='bat'></div>");
+            $('#info').css('background-image', "url('" + DIR + "comeback.png')");
+        }
+        var count_firs = parseInt($('#stolb').text());
+        if (count_firs == 0 || count_firs == 1 || count_firs == 2){
+            count_firs = 3;
+        }
+        $('#lvl button').text(parseFloat((count_firs / 3).toFixed(1)));
+    });
+
+    VK.api("friends.getAppUsers", {}, function(data) {
+        arrFriends = data;
     });
 
     function ajaxRequest(url, type, data, func){
@@ -78,26 +77,6 @@ $(document).ready(function(){
         $('#game_start').click();
         $('#game_start').click()
     });
-
-    /* Logics */
-
-    var array_map_world = getWordAndElka();
-
-    var color;
-
-    var history;
-
-    var ball_l = 30;
-
-    var array_loc = [];
-
-    var array_loc_figure = [];
-
-    var hint;
-
-    var elka_hint;
-
-    var hint_number = 3;
 
     function get_elka_hint() {
         $('.word').html(elka_hint);
@@ -232,17 +211,20 @@ $(document).ready(function(){
 
     function create_figure(y, x, type_figure) {
         var location;
-        if (type_figure == "cross")
-            location = new Location(y, x, 1, 1, 1, 1, DIR + "cross_on.png", DIR + "cross_off.png", "cross", false)
-        else if (type_figure == "straight")
-            location = new Location(y, x, 1, 0, 1, 0, DIR + "straight_on.png", DIR + "straight_off.png", "straight", false)
-        else if (type_figure == "curve_3")
-            location = new Location(y, x, 1, 1, 0, 1, DIR + "curve_3_on.png", DIR + "curve_3_off.png", "curve_3", false)
+        if (type_figure == "cross"){
+            location = new Location(y, x, 1, 1, 1, 1, DIR + "cross_on.png", DIR + "cross_off.png", "cross", false);
+        }
+        else if (type_figure == "straight"){
+            location = new Location(y, x, 1, 0, 1, 0, DIR + "straight_on.png", DIR + "straight_off.png", "straight", false);
+        }
+        else if (type_figure == "curve_3"){
+            location = new Location(y, x, 1, 1, 0, 1, DIR + "curve_3_on.png", DIR + "curve_3_off.png", "curve_3", false);
+        }
         else if (type_figure == "ball") {
-            var array_ball_color = ['red', 'blue', 'green', 'yellow'];
-            var on, off, color_fun = array_ball_color[getRandomInt(0, array_ball_color.length - 1)];
-            while (color_fun == color)
+            var array_ball_color = ['red', 'blue', 'green', 'yellow'], on, off, color_fun = array_ball_color[getRandomInt(0, array_ball_color.length - 1)];
+            while (color_fun == color){
                 color_fun = array_ball_color[getRandomInt(0, array_ball_color.length - 1)];
+            }
             switch (color_fun) {
                 case "red":
                     on = "red_on.png";
@@ -263,10 +245,12 @@ $(document).ready(function(){
             }
             color = color_fun;
             location = new Location(y, x, 1, 0, 0, 0, DIR + on, DIR + off, "ball", false);
-        } else if (type_figure == "curve_2")
+        } else if (type_figure == "curve_2") {
             location = new Location(y, x, 1, 1, 0, 0, DIR + "curve_2_on.png", DIR + "curve_2_off.png", "curve_2", false);
-        else if (type_figure == "star")
+        }
+        else if (type_figure == "star"){
             location = new Location(y, x, 0, 0, 1, 0, DIR + "star_on.png", DIR + "star_off.png", "star", false);
+        }
         return location;
     }
 
@@ -415,7 +399,7 @@ $(document).ready(function(){
             if (y == 13 && x == 7) {
                 array_map_world[13][7].charge = true;
                 array_map_world[y][x - 1].skip = 1;
-                $('#y_' + 13 + "_x_" + 7).css("background-image", "url(" + array_map_world[13][7].image_on + ")")
+                $('#y_' + 13 + "_x_" + 7).css("background-image", "url(" + array_map_world[13][7].image_on + ")");
             }
             if (array_map_world[y][x].type_figure != "ball") {
                 if (x != 0 && array_map_world[y][x].charge == true && array_map_world[y][x].left == 1 && array_map_world[y][x - 1].skip_figure == 0 && array_map_world[y][x - 1].right == 1) {
@@ -423,28 +407,28 @@ $(document).ready(function(){
                     array_map_world[y][x - 1].skip_figure = 1;
                     var x_2 = x - 1;
                     $('#y_' + y + "_x_" + x_2).css("background-image", "url(" + array_map_world[y][x_2].image_on + ")");
-                    getH(y, x_2)
+                    getH(y, x_2);
                 }
                 if (y != 0 && array_map_world[y][x].charge == true && array_map_world[y][x].top == 1 && array_map_world[y - 1][x].bottom == 1 && array_map_world[y - 1][x].skip_figure == 0) {
                     array_map_world[y - 1][x].charge = true;
                     array_map_world[y - 1][x].skip_figure = 1;
                     var y_2 = y - 1;
                     $('#y_' + y_2 + "_x_" + x).css("background-image", "url(" + array_map_world[y_2][x].image_on + ")");
-                    getH(y_2, x)
+                    getH(y_2, x);
                 }
                 if (x != 14 && array_map_world[y][x].charge == true && array_map_world[y][x].right == 1 && array_map_world[y][x + 1].left == 1 && array_map_world[y][x + 1].skip_figure == 0) {
                     array_map_world[y][x + 1].charge = true;
                     array_map_world[y][x + 1].skip_figure = 1;
                     var x_2 = x + 1;
                     $('#y_' + y + "_x_" + x_2).css("background-image", "url(" + array_map_world[y][x_2].image_on + ")");
-                    getH(y, x_2)
+                    getH(y, x_2);
                 }
                 if (y != 13 && array_map_world[y][x].charge == true && array_map_world[y][x].bottom == 1 && array_map_world[y + 1][x].top == 1 && array_map_world[y + 1][x].skip_figure == 0) {
                     array_map_world[y + 1][x].charge = true;
                     array_map_world[y + 1][x].skip_figure = 1;
                     var y_2 = y + 1;
                     $('#y_' + y_2 + "_x_" + x).css("background-image", "url(" + array_map_world[y_2][x].image_on + ")");
-                    getH(y_2, x)
+                    getH(y_2, x);
                 }
             }
         } else {
@@ -452,7 +436,7 @@ $(document).ready(function(){
                 for (var j = 0; j < array_map_world[i].length; j++) {
                     if (array_map_world[i][j] != 0) {
                         $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")");
-                        array_map_world[i][j].charge = false
+                        array_map_world[i][j].charge = false;
                     }
                 }
             }
@@ -460,11 +444,11 @@ $(document).ready(function(){
                 for (var j = 0; j < array_map_world[i].length; j++) {
                     if (array_map_world[i][j] != 0) {
                         array_map_world[i][j].skip_figure = 0;
-                        array_map_world[i][j].charge = false
+                        array_map_world[i][j].charge = false;
                     }
                 }
             }
-            array_map_world[14][7].charge = true
+            array_map_world[14][7].charge = true;
         }
     }
 
@@ -473,12 +457,12 @@ $(document).ready(function(){
             for (var j = 0; j < array_map_world[i].length; j++) {
                 if (array_map_world[i][j] != 0) {
                     if (array_map_world[i][j].charge == true) {
-                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_on + ")").css('cursor', 'pointer')
+                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_on + ")").css('cursor', 'pointer');
                     } else {
-                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")").css('cursor', 'pointer')
+                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")").css('cursor', 'pointer');
                     }
-                    $('#y_' + array_map_world[i][j].y + "_x_" + array_map_world[i][j].x).rotate(array_map_world[i][j].degrees)
-                } else {}
+                    $('#y_' + array_map_world[i][j].y + "_x_" + array_map_world[i][j].x).rotate(array_map_world[i][j].degrees);
+                }
             }
         }
     }
@@ -492,12 +476,12 @@ $(document).ready(function(){
                 if (array_map_world[i][j] != 0) {
                     if (array_map_world[i][j].charge == false) {
                         flag = false;
-                        break
+                        break;
                     }
                 }
             }
         }
-        return flag
+        return flag;
     }
 
     function SkipDefault() {
@@ -505,11 +489,11 @@ $(document).ready(function(){
             for (var j = 0; j < array_map_world[i].length; j++) {
                 if (array_map_world[i][j] != 0) {
                     array_map_world[i][j].skip_figure = 0;
-                    array_map_world[i][j].charge = false
+                    array_map_world[i][j].charge = false;
                 }
             }
         }
-        array_map_world[14][7].charge = true
+        array_map_world[14][7].charge = true;
     }
 
     function setBall(y, x) {
@@ -521,38 +505,38 @@ $(document).ready(function(){
                 getTurn(y, x);
                 if (isCharge()) {
                     flag = true;
-                    i = 3
+                    i = 3;
                 }
             }
         }
-        return flag
+        return flag;
     }
 
     function setFigure() {
-        var array_ficure = ['curve_2', 'straight', 'curve_3', 'cross'];
+        var array_figure = ['curve_2', 'straight', 'curve_3', 'cross'];
         for (var i = 2; i <= array_map_world.length - 2; i++) {
             for (var j = 0; j < array_map_world[i].length; j++) {
                 if (array_map_world[i][j] != 0 && array_map_world[i][j].type_figure != "ball") {
                     var flag = true;
                     while (flag) {
-                        for (var f = 0; f < array_ficure.length; f++) {
-                            array_map_world[i][j] = create_figure(i, j, array_ficure[f]);
+                        for (var f = 0; f < array_figure.length; f++) {
+                            array_map_world[i][j] = create_figure(i, j, array_figure[f]);
                             if (isCharge()) {
                                 flag = false;
                                 f = 5;
-                                break
+                                break;
                             } else {
                                 for (var h = 0; h <= 3; h++) {
                                     getTurn(i, j);
                                     if (isCharge()) {
                                         flag = false;
                                         f = 5;
-                                        break
+                                        break;
                                     }
                                 }
                             }
                         }
-                        flag = false
+                        flag = false;
                     }
                 }
             }
@@ -560,8 +544,7 @@ $(document).ready(function(){
     }
 
     function getWord() {
-        var y = 0;
-        var array_loc = [];
+        var y = 0, array_loc = [];
         hint_number = 3;
         $('#hint button').text("Подсказки (" + hint_number + ")");
         $('#hint button').css('cursor', 'pointer');
@@ -570,7 +553,7 @@ $(document).ready(function(){
                 if (array_map_world[i][j] != 0) {
                     array_map_world[i][j] = create_figure(i, j, 'cross');
                     if ((i != 13 && j != 7) || (i != 1 && j != 7) || (i != 2 && j != 7)) {
-                        array_loc[y++] = i + '/' + j
+                        array_loc[y++] = i + '/' + j;
                     }
                 }
             }
@@ -588,7 +571,7 @@ $(document).ready(function(){
             } else {
                 array_map_world[arr[0]][arr[1]] = create_figure(arr[0], arr[1], 'cross');
                 array_loc.splice(random_ball, 1);
-                ball_l++
+                ball_l++;
             }
         }
         setFigure();
@@ -603,7 +586,7 @@ $(document).ready(function(){
                             array_map_world[i][j] = create_figure(i, j, 'ball');
                             getTurn(i, j);
                             if (isCharge() == false) {
-                                array_map_world[i][j] = loc
+                                array_map_world[i][j] = loc;
                             }
                         }
                         if (array_map_world[i][j].top == 1 && array_map_world[i][j].right == 1 && array_map_world[i - 1][j].bottom == 0) {
@@ -611,7 +594,7 @@ $(document).ready(function(){
                             array_map_world[i][j] = create_figure(i, j, 'ball');
                             getTurn(i, j);
                             if (isCharge() == false) {
-                                array_map_world[i][j] = loc
+                                array_map_world[i][j] = loc;
                             }
                         }
                     }
@@ -625,7 +608,7 @@ $(document).ready(function(){
          if (array_map_world[i][j] != 0) {
          var k = getRandomInt(0, 3);
          for (var v = 0; v < k; v++) {
-         getTurn(i, j)
+         getTurn(i, j);
          }
          }
          }
@@ -633,7 +616,7 @@ $(document).ready(function(){
         SkipDefault();
         getH(13, 7);
         DrawAllFigure();
-        $('.loc').css('display', 'block')
+        $('.loc').show();
     }
 
     $(document).on("click", "#bat", function() {
@@ -641,8 +624,8 @@ $(document).ready(function(){
         $('.word').html('');
         getWordAndElka();
         ball_l = 30;
-        $('#hint').css('display', 'block');
-        getWord()
+        $('#hint').show();
+        getWord();
     });
 
     $(document).on("mousedown", ".loc", function() {
@@ -657,100 +640,100 @@ $(document).ready(function(){
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].right == 1 && array_map_world[y][x].left == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 }
             } else if (array_map_world[y][x].type_figure == "star") {
                 if (array_map_world[y][x].bottom == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].left == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 } else if (array_map_world[y][x].top == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 } else if (array_map_world[y][x].right == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 }
             } else if (array_map_world[y][x].type_figure == "curve_3") {
                 if (array_map_world[y][x].top == 1 && array_map_world[y][x].left == 1 && array_map_world[y][x].right == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 } else if (array_map_world[y][x].top == 1 && array_map_world[y][x].right == 1 && array_map_world[y][x].bottom == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].left == 1 && array_map_world[y][x].right == 1 && array_map_world[y][x].bottom == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].left == 1 && array_map_world[y][x].top == 1 && array_map_world[y][x].bottom == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 }
             } else if (array_map_world[y][x].type_figure == "ball") {
                 if (array_map_world[y][x].top == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 } else if (array_map_world[y][x].right == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 } else if (array_map_world[y][x].bottom == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].left == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 }
             } else if (array_map_world[y][x].type_figure == "curve_2") {
                 if (array_map_world[y][x].top == 1 && array_map_world[y][x].right == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 } else if (array_map_world[y][x].right == 1 && array_map_world[y][x].bottom == 1) {
                     array_map_world[y][x].top = 0;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 1;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].bottom == 1 && array_map_world[y][x].left == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 0;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 1
+                    array_map_world[y][x].left = 1;
                 } else if (array_map_world[y][x].left == 1 && array_map_world[y][x].top == 1) {
                     array_map_world[y][x].top = 1;
                     array_map_world[y][x].right = 1;
                     array_map_world[y][x].bottom = 0;
-                    array_map_world[y][x].left = 0
+                    array_map_world[y][x].left = 0;
                 }
             }
             for (var i = 0; i < array_map_world.length; i++) {
@@ -758,7 +741,7 @@ $(document).ready(function(){
                     if (array_map_world[i][j] != 0 || array_map_world[i][j] == 1) {
                         $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")").css('cursor', 'pointer');
                         array_map_world[i][j].skip_figure = 0;
-                        array_map_world[i][j].charge = false
+                        array_map_world[i][j].charge = false;
                     }
                 }
             }
@@ -771,7 +754,7 @@ $(document).ready(function(){
                     if (array_map_world[i][j] != 0 && array_map_world[i][j].type_figure == 'ball' || array_map_world[i][j] != 0 && array_map_world[i][j].type_figure == "star") {
                         if (array_map_world[i][j].charge == false) {
                             flag = false;
-                            break
+                            break;
                         }
                     }
                 }
@@ -792,9 +775,9 @@ $(document).ready(function(){
                             if (Number.isInteger(ttt)) {
                                 var g;
                                 if (data.response[0].sex == 1) {
-                                    g = "достигла " + ttt
+                                    g = "достигла " + ttt;
                                 } else {
-                                    g = "достиг " + ttt
+                                    g = "достиг " + ttt;
                                 }
                                 VK.api('wall.post', {
                                     message: 'Я ' + g + ' уровня в игре "Ёлочка, гори" https://vk.com/app5144297',
@@ -822,7 +805,7 @@ $(document).ready(function(){
                         }
                     });
                 });
-                $('.word').html("<div id='info_flag' style='width:480px; height:340px;'></div><div id='bat'></div>")
+                $('.word').html("<div id='info_flag' style='width:480px; height:340px;'></div><div id='bat'></div>");
             }
             $('#y_' + 14 + "_x_" + 7).css("background-image", "url(" + array_map_world[14][7].image_on + ")");
             $('#y_' + array_map_world[y][x].y + "_x_" + array_map_world[y][x].x).rotate({
@@ -833,7 +816,7 @@ $(document).ready(function(){
 
     $(document).on("click", "#game_start", function() {
         $(this).remove();
-        getWord()
+        getWord();
     });
 
     $(document).on("click", "#rating", function() {
@@ -843,9 +826,9 @@ $(document).ready(function(){
         var html = "<div id='panel_rating' style='width:100%;height:37px;'><div id='rating_today'></div><div id='rating_all'></div><div id='rating_friends'></div></div><div id='rating_content'></div>";
         $('.word').html(html);
         $('.elka').css("background", "transparent");
-        $('.loc').css('display', 'none');
-        $('#hint').css('display', 'none');
-        $('#rating_today').click()
+        $('.loc').hide();
+        $('#hint').hide();
+        $('#rating_today').click();
     });
 
     $(document).on("click", "#rating_game", function() {
@@ -856,9 +839,9 @@ $(document).ready(function(){
         $('.elka').css("background-image", "url('" + DIR + "pine1_1.png')");
         $('.word').html(history);
         getH(13, 7);
-        $('.loc').css('display', 'block');
+        $('.loc').show();
         DrawAllFigure();
-        $('#hint').css('display', 'block')
+        $('#hint').show();
     });
 
     $(document).on("click", "#invite", function() {
@@ -870,30 +853,26 @@ $(document).ready(function(){
             elka_hint = $('.word').html();
             $('.word').html(hint);
             setTimeout(get_elka_hint, 1200);
-            $('#hint button').text("Подсказки (" + --hint_number + ")")
+            $('#hint button').text("Подсказки (" + --hint_number + ")");
         } else {
-            $('#hint button').css('cursor', 'default')
+            $('#hint button').css('cursor', 'default');
         }
         if (hint_number == 0) {
-            $('#hint button').css('cursor', 'default')
+            $('#hint button').css('cursor', 'default');
         }
     });
-
-    /*Рейтинг*/
     
     function getRating(dataRating) {
         ajaxRequest('/vk/fir/rating', 'post', dataRating, function (data) {
             if(data.status == 'success'){
-                var g = '';
-                var count = data.data.users.length;
+                var count = data.data.users.length, g = '';
                 if(count == 0){
                     g = "<div class='rating_not'>Рейтинг пуст :(</div>" +
                         "<div id='invite' style='float:left; margin-top:10px; margin-left:130px;'></div>";
                     $('#rating_content').html(g);
                 }else{
                     var type = dataRating.type;
-                    var html = '';
-                    var vk_ids = [];
+                    var html = '', vk_ids = [];
                     var n = (parseInt(data.data.page) - 1) * 7 + 1;
                     for(var i = 0; i < count; i++){
                         html += "<div class = 'tablo'><div id='tablo_number'><button>" + (i + n) + "</button></div><div id='tablo_avatar' ><a href='https://vk.com/id" + data.data.users[i].vk_id + "' target='_blank'><img class='table_avatar_" + data.data.users[i].vk_id + "' style='width:100%;height:100%' src='/images/VK/load_avatar.gif'/></a></div><div id='tablo_first_name_and_last_name'><div id='tablo_first_name'><button class='table_first_name_" + data.data.users[i].vk_id + "'></button></div><div id='tablo_first_name'><button class='table_last_name_" + data.data.users[i].vk_id + "'></button></div></div><div id='tablo_coutn'>" + data.data.users[i].count_firs + "</div></div>";
@@ -904,7 +883,7 @@ $(document).ready(function(){
                         for (var i = 0, l = vk.response.length; i < l; i++) {
                             $('.table_avatar_' + vk.response[i].uid).attr("src", vk.response[i].photo_50);
                             $('.table_first_name_' + vk.response[i].uid).text(vk.response[i].first_name);
-                            $('.table_last_name_' + vk.response[i].uid).text(vk.response[i].last_name)
+                            $('.table_last_name_' + vk.response[i].uid).text(vk.response[i].last_name);
                         }
                     });
                     if(data.data.next){
@@ -965,10 +944,7 @@ $(document).ready(function(){
     });
 
     $(document).on("click", "#rating_friends", function() {
-        VK.api("friends.getAppUsers", {}, function(data) {
-            console.log(data);
-            rating({type: 'friends', page: 1, vk_ids: data});
-        })
+        rating({type: 'friends', page: 1, vk_ids: arrFriends});
     });
 
 });

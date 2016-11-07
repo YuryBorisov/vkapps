@@ -9,19 +9,23 @@ class AnimalsLevel extends Model
 {
     protected $table = 'vk_animals_levels';
 
-    public function add(array $arr){
+    public function add(array $arr)
+    {
         return $this->db()->insert($arr);
     }
 
-    public function getLevels(array $field = ['*']){
+    public function getLevels(array $field = ['*'])
+    {
         return $this->db()->select($field)->get();
     }
 
-    public function getLevelById($levelId, array $field = ['*']){
+    public function getLevelById($levelId, array $field = ['*'])
+    {
         return $this->db()->where('level_id', $levelId)->first($field);
     }
 
-    private function db(){
+    private function db()
+    {
         return DB::table($this->table);
     }
 }

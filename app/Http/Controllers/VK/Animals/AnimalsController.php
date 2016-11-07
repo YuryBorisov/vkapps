@@ -23,7 +23,8 @@ class AnimalsController extends Controller
 
     const PARAM_GET = ['count_animals', 'level'];
 
-    public function app(Request $request){
+    public function app(Request $request)
+    {
         $vkId = $request->input('viewer_id');
         if($user = UserRepository::instance()->getById($vkId)){
             $data = ['level' => $user->level, 'count_animals' => $user->count_animals];
@@ -35,7 +36,8 @@ class AnimalsController extends Controller
     }
 
     public function animals(){
-        if($data = AnimalsTypeRepository::instance()->get()){
+        if($data = AnimalsTypeRepository::instance()->get())
+        {
             $this->response['response']['status'] = 'success';
             $this->response['response']['data'] = $data;
         }else{
@@ -44,7 +46,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function inc(Request $request){
+    public function inc(Request $request)
+    {
         if($request->has('arcade') && $request->has('count_animals') && $request->has('vk_id')){
             $data = $request->all();
             if(is_numeric($data['count_animals']) && is_numeric($data['vk_id'])){
@@ -96,7 +99,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function get(Request $request){
+    public function get(Request $request)
+    {
         if($request->has('vk_id')){
             $data = $request->all();
             if($user = UserRepository::instance()->getById($data['vk_id'])){
@@ -114,7 +118,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function arcadeGetLevel(Request $request){
+    public function arcadeGetLevel(Request $request)
+    {
         if($request->has('level_id')){
             if($level = AnimalsLevelRepository::instance()->getByLevel($request->input('level_id'))){
                 $this->response['response']['status'] = 'success';
@@ -128,7 +133,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function arcadeGetLevels(){
+    public function arcadeGetLevels()
+    {
         if($levels = AnimalsLevelRepository::instance()->get()){
             $this->response['response']['status'] = 'success';
             $this->response['response']['data']['levels'] = $levels;
@@ -138,7 +144,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function arcadeGetLevelUser(Request $request){
+    public function arcadeGetLevelUser(Request $request)
+    {
         if($request->has('vk_id')){
             if($user = UserRepository::instance()->getById($request->input('vk_id'))){
                 if($level = AnimalsLevelRepository::instance()->getByLevel($user->level)){
@@ -156,7 +163,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function rating(Request $request){
+    public function rating(Request $request)
+    {
         if($request->has('type')){
             $result['users'] = false;
             $data = $request->all();
@@ -207,7 +215,8 @@ class AnimalsController extends Controller
         return $this->response;
     }
 
-    public function generate(){
+    public function generate()
+    {
         $vkIds = [
             '36765', '12676639', '16622006', '17157431',
             '22697595', '32070524', '36053375', '72969633',

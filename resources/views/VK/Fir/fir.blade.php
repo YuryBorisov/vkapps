@@ -3,12 +3,12 @@
 <head>
     <script type="text/javascript" src="/js/jquery-2.0.0.min.js"></script>
     <link rel="stylesheet" href="/css/VK/Fir/app.css" />
-    <script src="/js/VK/Fir/app.min.js"></script>
+    <script src="/js/VK/Fir/app.js"></script>
     <script type="text/javascript" src="/js/jqueryrotate.2.1.js"></script>
     <script src="//vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
-<body>
+<body user="{{$data['user']}}">
 <div class='wrapper'>
     <div class='fon'>
         <div class='left_content'>
@@ -23,7 +23,7 @@
                 <button></button>
             </div>
             <div id='stolb'>
-                <div></div>
+                <div>{{$data['count_firs']}}</div>
             </div>
         </div>
         <div class='center_content'>
