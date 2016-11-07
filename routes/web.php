@@ -16,7 +16,7 @@ Route::get('/', ['as' => 'home', 'uses' => 'Controller@home']);
 Route::group(['prefix' => 'vk'], function(){
     Route::group(['prefix' => 'fir'], function(){
         Route::get('app', ['as' => 'vk.fir.app', 'uses' => 'VK\Fir\FirController@app']);
-        Route::post('rating', ['as' => 'vk.fir.rating', 'uses' => 'VK\Fir\FirController@getRating']);
+        Route::post('rating', ['as' => 'vk.fir.rating', 'uses' => 'VK\Fir\FirController@rating']);
         Route::post('add', ['as' => 'vk.fir.add', 'uses' => 'VK\Fir\FirController@addFir']);
         Route::get('generate', ['as' => 'vk.fir.generate', 'uses' => 'VK\Fir\FirController@generate']);
     });
