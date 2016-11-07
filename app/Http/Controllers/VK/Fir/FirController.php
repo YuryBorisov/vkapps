@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 class FirController extends Controller
 {
 
+    protected $response = ['response' => ['status' => 'error']];
+
     const RATING_COUNT_USERS = 7;
 
     public function app(Request $request)
@@ -31,9 +33,8 @@ class FirController extends Controller
         return 'Error';
     }
 
-    public function getRating(Request $request)
+    public function rating(Request $request)
     {
-        $response['status'] = 'error';
         if($request->has('type') && $request->has('page')){
             $result['users'] = false;
             $data = $request->all();
@@ -46,7 +47,7 @@ class FirController extends Controller
                     $result['users'] = (new Firs())->getCountUsersFirByDate(date('Y-m-d'), $skip, self::RATING_COUNT_USERS + 1);
                     break;
                 case 'all':
-                    $result['users'] = (new FirUsers())->getUsers($skip, self::RATING_COUNT_USERS + 1, 'desc', ['vk_id', 'count_firs']);
+                    $result['users'] = (new FirUsers())->getUsers($skip, self::RATING_COUNT_USERS + 1, 1, 'desc', ['vk_id', 'count_firs']);
                     break;
                 case 'friends':
                     if(isset($data['vk_ids']) && is_array($data['vk_ids'])){
@@ -61,20 +62,19 @@ class FirController extends Controller
                 }else{
                     $result['next'] = false;
                 }
-                $response['status'] = 'success';
-                $response['data'] = $result;
+                $this->response['status'] = 'success';
+                $this->response['data'] = $result;
             }else{
-                $response['message'] = 'Такой тип рейтинга не существует';
+                $this->response['message'] = 'Такой тип рейтинга не существует';
             }
         }else{
-            $response['message'] = 'В запросе отсутствует тип рейтинга и номер страница';
+            $this->response['message'] = 'В запросе отсутствует тип рейтинга и номер страница';
         }
-        return $response;
+        return $this->response;
     }
 
     public function addFir(Request $request)
     {
-        $response['status'] = 'error';
         if($request->has('vk_id')){
             if($user = ($userRepository = UserRepository::instance())->getById($vkId = $request->input('vk_id'))){
                 DB::beginTransaction();
@@ -82,21 +82,21 @@ class FirController extends Controller
                     (new Firs())->add(['vk_id' => $vkId, 'create' => date('Y-m-d H:i:s')]);
                     (new FirUsers())->incrementCountFirs($vkId);
                     $userRepository->removeById($vkId);
-                    $response['status'] = 'success';
-                    $response['data']['count_firs'] = ++$user->count_firs;
+                    $this->response['status'] = 'success';
+                    $this->response['data']['count_firs'] = ++$user->count_firs;
                     DB::commit();
                 }catch (QueryException $e){
                     DB::rollback();
                     Log::error(__LINE__.' строка в '.__CLASS__.' Ошибка: "'.$e->getMessage().'"');
-                    $response['message'] = 'Попробуйте позже';
+                    $this->response['message'] = 'Попробуйте позже';
                 }
             }else{
-                $response['message'] = 'Пользователь с таким id не существует';
+                $this->response['message'] = 'Пользователь с таким id не существует';
             }
         }else{
-            $response['message'] = 'В запросе отсутствует vk_id';
+            $this->response['message'] = 'В запросе отсутствует vk_id';
         }
-        return $response;
+        return $this->response;
     }
 
     public function generate()
