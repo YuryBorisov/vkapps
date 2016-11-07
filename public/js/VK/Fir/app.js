@@ -212,13 +212,13 @@ $(document).ready(function(){
     function create_figure(y, x, type_figure) {
         var location;
         if (type_figure == "cross"){
-            location = new Location(y, x, 1, 1, 1, 1, DIR + "cross_on.png", DIR + "cross_off.png", "cross", false);
+            location = new Location(y, x, 1, 1, 1, 1, "cross_on", "cross_off", "cross", false);
         }
         else if (type_figure == "straight"){
-            location = new Location(y, x, 1, 0, 1, 0, DIR + "straight_on.png", DIR + "straight_off.png", "straight", false);
+            location = new Location(y, x, 1, 0, 1, 0, "straight_on", "straight_off", "straight", false);
         }
         else if (type_figure == "curve_3"){
-            location = new Location(y, x, 1, 1, 0, 1, DIR + "curve_3_on.png", DIR + "curve_3_off.png", "curve_3", false);
+            location = new Location(y, x, 1, 1, 0, 1, "curve_3_on", "curve_3_off", "curve_3", false);
         }
         else if (type_figure == "ball") {
             var array_ball_color = ['red', 'blue', 'green', 'yellow'], on, off, color_fun = array_ball_color[getRandomInt(0, array_ball_color.length - 1)];
@@ -227,43 +227,43 @@ $(document).ready(function(){
             }
             switch (color_fun) {
                 case "red":
-                    on = "red_on.png";
-                    off = "red_off.png";
+                    on = "red";
+                    off = "red";
                     break;
                 case "blue":
-                    on = "blue_on.png";
-                    off = "blue_off.png";
+                    on = "blue";
+                    off = "blue";
                     break;
                 case "green":
-                    on = "green_on.png";
-                    off = "green_off.png";
+                    on = "green";
+                    off = "green";
                     break;
                 case "yellow":
-                    on = "yellow_on.png";
-                    off = "yellow_off.png";
-                    break
+                    on = "yellow";
+                    off = "yellow";
             }
             color = color_fun;
-            location = new Location(y, x, 1, 0, 0, 0, DIR + on, DIR + off, "ball", false);
+            location = new Location(y, x, 1, 0, 0, 0, on + '_on', off + '_off', "ball", false);
         } else if (type_figure == "curve_2") {
-            location = new Location(y, x, 1, 1, 0, 0, DIR + "curve_2_on.png", DIR + "curve_2_off.png", "curve_2", false);
+            location = new Location(y, x, 1, 1, 0, 0, "curve_2_on", "curve_2_off", "curve_2", false);
         }
         else if (type_figure == "star"){
-            location = new Location(y, x, 0, 0, 1, 0, DIR + "star_on.png", DIR + "star_off.png", "star", false);
+            location = new Location(y, x, 0, 0, 1, 0, "star_on", "star_off", "star", false);
         }
         return location;
     }
 
     function getWordAndElka() {
         var array_map_world = [];
-        for (i = 0; i < 15; i++) {
+        var html = '';
+        for (var i = 0; i < 15; i++) {
             array_map_world[i] = [];
-            for (j = 0; j < 15; j++) {
+            for (var j = 0; j < 15; j++) {
                 array_map_world[i][j] = 0;
-                var loc = "y_" + i + "_x_" + j;
-                $('.word').append("<div id='" + loc + "' class='loc'></div>")
+                html += "<div id='y_" + i + "_x_" + j +"' class='loc'></div>";
             }
         }
+        $('.word').html(html);
         array_map_world[0][7] = 1;
         array_map_world[1][7] = 1;
         array_map_world[2][6] = 1;
@@ -399,35 +399,35 @@ $(document).ready(function(){
             if (y == 13 && x == 7) {
                 array_map_world[13][7].charge = true;
                 array_map_world[y][x - 1].skip = 1;
-                $('#y_' + 13 + "_x_" + 7).css("background-image", "url(" + array_map_world[13][7].image_on + ")");
+                $('#y_' + 13 + "_x_" + 7).removeClass().addClass('loc '+array_map_world[13][7].image_on);
             }
             if (array_map_world[y][x].type_figure != "ball") {
                 if (x != 0 && array_map_world[y][x].charge == true && array_map_world[y][x].left == 1 && array_map_world[y][x - 1].skip_figure == 0 && array_map_world[y][x - 1].right == 1) {
                     array_map_world[y][x - 1].charge = true;
                     array_map_world[y][x - 1].skip_figure = 1;
                     var x_2 = x - 1;
-                    $('#y_' + y + "_x_" + x_2).css("background-image", "url(" + array_map_world[y][x_2].image_on + ")");
+                    $('#y_' + y + "_x_" + x_2).removeClass().addClass('loc '+array_map_world[y][x_2].image_on);
                     getH(y, x_2);
                 }
                 if (y != 0 && array_map_world[y][x].charge == true && array_map_world[y][x].top == 1 && array_map_world[y - 1][x].bottom == 1 && array_map_world[y - 1][x].skip_figure == 0) {
                     array_map_world[y - 1][x].charge = true;
                     array_map_world[y - 1][x].skip_figure = 1;
                     var y_2 = y - 1;
-                    $('#y_' + y_2 + "_x_" + x).css("background-image", "url(" + array_map_world[y_2][x].image_on + ")");
+                    $('#y_' + y_2 + "_x_" + x).removeClass().addClass('loc '+array_map_world[y_2][x].image_on);
                     getH(y_2, x);
                 }
                 if (x != 14 && array_map_world[y][x].charge == true && array_map_world[y][x].right == 1 && array_map_world[y][x + 1].left == 1 && array_map_world[y][x + 1].skip_figure == 0) {
                     array_map_world[y][x + 1].charge = true;
                     array_map_world[y][x + 1].skip_figure = 1;
                     var x_2 = x + 1;
-                    $('#y_' + y + "_x_" + x_2).css("background-image", "url(" + array_map_world[y][x_2].image_on + ")");
+                    $('#y_' + y + "_x_" + x_2).removeClass().addClass('loc '+array_map_world[y][x_2].image_on);
                     getH(y, x_2);
                 }
                 if (y != 13 && array_map_world[y][x].charge == true && array_map_world[y][x].bottom == 1 && array_map_world[y + 1][x].top == 1 && array_map_world[y + 1][x].skip_figure == 0) {
                     array_map_world[y + 1][x].charge = true;
                     array_map_world[y + 1][x].skip_figure = 1;
                     var y_2 = y + 1;
-                    $('#y_' + y_2 + "_x_" + x).css("background-image", "url(" + array_map_world[y_2][x].image_on + ")");
+                    $('#y_' + y_2 + "_x_" + x).removeClass().addClass('loc '+array_map_world[y_2][x].image_on);
                     getH(y_2, x);
                 }
             }
@@ -435,7 +435,7 @@ $(document).ready(function(){
             for (var i = 0; i < array_map_world.length; i++) {
                 for (var j = 0; j < array_map_world[i].length; j++) {
                     if (array_map_world[i][j] != 0) {
-                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")");
+                        $('#y_' + i + "_x_" + j).removeClass().addClass('loc '+array_map_world[i][j].image_off);
                         array_map_world[i][j].charge = false;
                     }
                 }
@@ -457,9 +457,9 @@ $(document).ready(function(){
             for (var j = 0; j < array_map_world[i].length; j++) {
                 if (array_map_world[i][j] != 0) {
                     if (array_map_world[i][j].charge == true) {
-                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_on + ")").css('cursor', 'pointer');
+                        $('#y_' + i + "_x_" + j).removeClass().addClass('loc '+array_map_world[i][j].image_on).css('cursor', 'pointer');
                     } else {
-                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")").css('cursor', 'pointer');
+                        $('#y_' + i + "_x_" + j).removeClass().addClass('loc '+array_map_world[i][j].image_off).css('cursor', 'pointer');
                     }
                     $('#y_' + array_map_world[i][j].y + "_x_" + array_map_world[i][j].x).rotate(array_map_world[i][j].degrees);
                 }
@@ -604,14 +604,13 @@ $(document).ready(function(){
         DrawAllFigure();
         hint = $('.word').html();
         for (var i = 2; i <= array_map_world.length - 2; i++) {
-         for (var j = 0; j < array_map_world[i].length; j++) {
-         if (array_map_world[i][j] != 0) {
-         var k = getRandomInt(0, 3);
-         for (var v = 0; v < k; v++) {
-         getTurn(i, j);
-         }
-         }
-         }
+            for (var j = 0; j < array_map_world[i].length; j++) {
+             if (array_map_world[i][j] != 0) {
+                  for (var v = 0, u = getRandomInt(0, 3); v < u; v++) {
+                      getTurn(i, j);
+                  }
+             }
+            }
         }
         SkipDefault();
         getH(13, 7);
@@ -620,7 +619,6 @@ $(document).ready(function(){
     }
 
     $(document).on("click", "#bat", function() {
-        $('.elka').css("background-image", "url('" + DIR + "pine1_1.png')");
         $('.word').html('');
         getWordAndElka();
         ball_l = 30;
@@ -739,13 +737,13 @@ $(document).ready(function(){
             for (var i = 0; i < array_map_world.length; i++) {
                 for (var j = 0; j < array_map_world[i].length; j++) {
                     if (array_map_world[i][j] != 0 || array_map_world[i][j] == 1) {
-                        $('#y_' + i + "_x_" + j).css("background-image", "url(" + array_map_world[i][j].image_off + ")").css('cursor', 'pointer');
+                        $('#y_' + i + "_x_" + j).removeClass().addClass('loc '+array_map_world[i][j].image_off).css('cursor', 'pointer');
                         array_map_world[i][j].skip_figure = 0;
                         array_map_world[i][j].charge = false;
                     }
                 }
             }
-            $('#y_' + 14 + "_x_" + 7).css("background-image", "url(" + array_map_world[14][7].image_on + ")");
+            $('#y_' + 14 + "_x_" + 7).removeClass().addClass('loc '+array_map_world[14][7].image_on);
             array_map_world[14][7].charge = true;
             getH(13, 7);
             var flag = true;
@@ -807,7 +805,7 @@ $(document).ready(function(){
                 });
                 $('.word').html("<div id='info_flag' style='width:480px; height:340px;'></div><div id='bat'></div>");
             }
-            $('#y_' + 14 + "_x_" + 7).css("background-image", "url(" + array_map_world[14][7].image_on + ")");
+            $('#y_' + 14 + "_x_" + 7).addClass(array_map_world[14][7].image_on);
             $('#y_' + array_map_world[y][x].y + "_x_" + array_map_world[y][x].x).rotate({
                 animateTo: array_map_world[y][x].degrees
             })
