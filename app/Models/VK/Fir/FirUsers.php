@@ -25,8 +25,8 @@ class FirUsers extends Model
     }
 
     public function getUsers($skip = 0, $limit = 1, $countFirs = 0, $orderBy = 'asc', array $field = ['*'])
-    {
-        return $this->db()->select($field)->where('count_firs', $countFirs)->skip($skip)->limit($limit)->orderBy('count_firs', $orderBy)->get();
+    { 
+        return $this->db()->select($field)->where('count_firs', '>', $countFirs)->skip($skip)->limit($limit)->orderBy('count_firs', $orderBy)->get(); 
     }
 
     public function getUsersIds(array $vkIds, $skip = 0, $limit = 1, $orderBy = 'asc', array $field = ['*'])
