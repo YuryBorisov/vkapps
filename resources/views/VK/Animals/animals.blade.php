@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="/css/VK/Animals/app.css" />
+    <link rel="stylesheet" type="text/css" href="/css/VK/Animals/app.min.css" />
     <script type="text/javascript" src="/js/jquery-2.0.0.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <script src="//vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>

@@ -25,14 +25,17 @@ class AnimalsController extends Controller
 
     public function app(Request $request)
     {
-        $vkId = $request->input('viewer_id');
-        if($user = UserRepository::instance()->getById($vkId)){
-            $data = ['level' => $user->level, 'count_animals' => $user->count_animals];
-        }else{
-            (new AnimalsUsers())->add(['vk_id' => $vkId, 'create' => date('Y-m-d H:i:s')]);
-            $data = ['level' => self::DEFAULT_LEVEL, 'count_animals' => 0];
+        if ($request->has('viewer_id')){
+            $vkId = $request->input('viewer_id');
+            if($user = UserRepository::instance()->getById($vkId)){
+                $data = ['level' => $user->level, 'count_animals' => $user->count_animals];
+            }else{
+                (new AnimalsUsers())->add(['vk_id' => $vkId, 'create' => date('Y-m-d H:i:s')]);
+                $data = ['level' => self::DEFAULT_LEVEL, 'count_animals' => 0];
+            }
+            return view('VK/Animals/animals', ['data' => $data]);
         }
-        return view('VK/Animals/animals', ['data' => $data]);
+        return 'Error';
     }
 
     public function animals(){
@@ -120,8 +123,8 @@ class AnimalsController extends Controller
 
     public function arcadeGetLevel(Request $request)
     {
-        if($request->has('level_id')){
-            if($level = AnimalsLevelRepository::instance()->getByLevel($request->input('level_id'))){
+        if($request->has('level_id') && is_numeric($l = $request->input('level_id'))){
+            if($level = AnimalsLevelRepository::instance()->getByLevel($l)){
                 $this->response['response']['status'] = 'success';
                 $this->response['response']['data'] = $level;
             }else{
@@ -182,7 +185,7 @@ class AnimalsController extends Controller
                 case 'friends':
                     if(isset($data['vk_ids']) && is_array($data['vk_ids'])){
                         $ids = [];
-                        foreach ($data['vk_ids'] as $id){
+                        foreach (array_unique($data['vk_ids']) as $id){
                             if(is_numeric($id)){
                                 $ids[] = $id;
                             }
