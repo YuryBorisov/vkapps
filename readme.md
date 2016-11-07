@@ -1,4 +1,4 @@
-# Laravel PHP Framework
+# Installation
 1. git clone
 2. composer install
 3. install memcached
