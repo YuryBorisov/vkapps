@@ -33,4 +33,9 @@ Route::group(['prefix' => 'vk'], function(){
             Route::post('levels', ['as' => 'vk.animals.arcade.levels', 'uses' => 'VK\Animals\AnimalsController@arcadeGetLevels']);
         });
     });
+    Route::group(['prefix' => 'new'], function (){
+        Route::get('app', function (){
+            return view('VK.New.new');
+        });
+    });
 });
