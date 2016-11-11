@@ -47,7 +47,7 @@ class FirController extends Controller
                     $result['users'] = (new Firs())->getCountUsersFirByDate(date('Y-m-d'), $skip, self::RATING_COUNT_USERS + 1);
                     break;
                 case 'all':
-                    $result['users'] = (new FirUsers())->getUsers($skip, self::RATING_COUNT_USERS + 1, 1, 'desc', ['vk_id', 'count_firs']);
+                    $result['users'] = (new FirUsers())->getUsers($skip, self::RATING_COUNT_USERS + 1, 0, 'desc', ['vk_id', 'count_firs']);
                     break;
                 case 'friends':
                     if(isset($data['vk_ids']) && is_array($data['vk_ids'])){
